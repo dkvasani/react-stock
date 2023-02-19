@@ -18,6 +18,7 @@ class LineChart extends React.Component {
 		tableData: []
 	};
 	counter = 0;
+	tableDataLocal = [];
 
 	options = [
 		14000, 14100, 14200, 14300, 14400, 14500, 14600, 14700, 14800, 14900,
@@ -43,6 +44,13 @@ class LineChart extends React.Component {
 	}
 
 	Remove = (numberIndex) => {
+		let currentState = this.state;
+		delete currentState["strike_" + numberIndex];
+		delete currentState["price_" + numberIndex];
+		delete currentState["ltPrice_" + numberIndex];
+		delete currentState["buySell_" + numberIndex];
+		this.setState(currentState);
+
 		document.getElementById(numberIndex).remove();
 	};
 
@@ -242,10 +250,21 @@ class LineChart extends React.Component {
 		var dataArr = [];
 
 		let localStore = this.allStorage();
+		console.log("LocalStore");
+		console.log(localStore);
 		for (let i = 0; i < localStore.length; i++) {
-			dataArr.push(JSON.parse(localStore[i]));
+			console.log("In Loop");
+			let finalJson = JSON.parse(localStore[i]);
+			console.log(i);
+			console.log(finalJson.strtegyName);
+			dataArr[i] = finalJson;
+			//dataArr.push({finalJson: finalJson.finalJson, finalJson2: finalJson.finalJson2});
 		}
+		console.log("Test Data");
+		console.log(dataArr);
 		this.setState({ tableData: dataArr });
+		console.log("TableData");
+		console.log(this.state.tableData);
 	}
 	render() {
 
@@ -305,14 +324,27 @@ class LineChart extends React.Component {
 				<span>Put Side Premium: {this.state.putsidePremium}</span><br />
 				<span>Call Side Premium: {this.state.callsidePremium}</span><br />
 				<CanvasJSChart options={options} />
-				Hi
+				
 				<div>
-				{this.state.tableData.map((tbl, index) => {
-					return <table style={{ borderCollapse: 'collapse' }} key={index}>
-						<tr>
-							<td>{tbl["ltPrice_0"]}</td></tr>	
-					</table>
-				})}
+					{this.state.tableData.map((tbl, index) => {
+						return <div><strong>{tbl.strtegyName}</strong><table style={{ borderCollapse: 'collapse' }} key={"tbl_" + index}>
+							<tr>
+								<td>Strike Price</td>
+								<td>Price</td>
+								<td>LT Price</td>
+								<td>Buy/Sell</td>
+							</tr>
+							{tbl.number.map((tbl2, index2) => {
+								return <tr key={index + "_row_" + index2}>
+									<td key={index + "_col_" + index2}>{tbl["strike_" + tbl2]}</td>
+									<td key={index + "_col_" + index2}>{tbl["price_" + tbl2]}</td>
+									<td key={index + "_col_" + index2}>{tbl["ltPrice_" + tbl2]}</td>
+									<td key={index + "_col_" + index2}>{tbl["buySell_" + tbl2]}</td>
+								</tr>
+							})}
+						</table><br />
+						</div>
+					})}
 				</div>
 			</div>
 		);
